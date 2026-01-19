@@ -1,0 +1,6 @@
+projectKey=sonar-report
+serverUrl=https://sonar.okuru.id
+serverVersion=26.1.0.118079
+dashboardUrl=https://sonar.okuru.id/dashboard?id=sonar-report
+ceTaskId=66d87847-9776-4343-ab3c-9abc1ecc2f02
+ceTaskUrl=https://sonar.okuru.id/api/ce/task?id=66d87847-9776-4343-ab3c-9abc1ecc2f02

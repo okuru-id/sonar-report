@@ -1,5 +1,7 @@
 # SonarQube Report Generator
 
+[![Quality Gate Status](https://sonar.okuru.id/api/project_badges/measure?project=sonar-report&metric=alert_status&token=sqb_ee78b692287ba458d5bc72fa508dd137e7f64cb5)](https://sonar.okuru.id/dashboard?id=sonar-report)
+
 A Go-based web application that automates code quality report generation from SonarQube. It produces Markdown and PDF reports featuring severity-categorized issues, accurate code snippets, and fix guidance. With parallel fetching optimization, reports generate in ~1.5 seconds—25x faster than sequential processing.
 
 ## Screenshots
@@ -212,6 +214,15 @@ curl -b cookies.txt -X POST "http://localhost:8080/api/v1/reports/generate" \
 | `REPORT_STORAGE_PATH` | Report files storage path | `./reports` |
 | `REPORT_RETENTION_DAYS` | Days to keep generated reports | `30` |
 
+#### SonarQube Scanner Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SCANNER_SONAR_HOST_URL` | SonarQube server URL for scanner | `https://sonar.okuru.id` |
+| `SCANNER_SONAR_TOKEN` | SonarQube token for scanner | - |
+| `SCANNER_PROJECT_KEY` | Project key in SonarQube | `sonar-report` |
+| `SCANNER_PROJECT_NAME` | Project display name | `SonarQube Report Generator` |
+
 ### Getting SonarQube Token
 
 1. Login to your SonarQube instance
@@ -265,6 +276,28 @@ go test ./...
 ```bash
 docker build -t sonarqube-report-generator .
 ```
+
+### Running SonarQube Scanner
+
+Analyze this project's code quality using the built-in sonar-scanner service:
+
+```bash
+# Configure scanner token in .env
+SCANNER_SONAR_TOKEN=sqp_your_token_here
+
+# Run sonar-scanner (one-time analysis)
+docker-compose --profile scanner run --rm sonar-scanner
+
+# Or run with custom parameters
+docker-compose --profile scanner run --rm sonar-scanner \
+  sonar-scanner \
+  -Dsonar.projectKey=my-custom-key \
+  -Dsonar.sources=. \
+  -Dsonar.host.url=https://sonar.okuru.id \
+  -Dsonar.token=$SCANNER_SONAR_TOKEN
+```
+
+After scanning, view the results at your SonarQube instance (e.g., `https://sonar.okuru.id/dashboard?id=sonar-report`).
 
 ## Performance
 

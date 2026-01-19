@@ -60,6 +60,29 @@ services:
       - sonarqube
     restart: unless-stopped
 
+  # SonarQube Scanner - Run on-demand to analyze this project's code
+  # Usage: docker-compose run --rm sonar-scanner
+  sonar-scanner:
+    image: sonarsource/sonar-scanner-cli:latest
+    container_name: sonar-scanner
+    environment:
+      SONAR_HOST_URL: ${SCANNER_SONAR_HOST_URL:-https://sonar.okuru.id}
+      SONAR_TOKEN: ${SCANNER_SONAR_TOKEN}
+    volumes:
+      - .:/usr/src
+    working_dir: /usr/src
+    command: >
+      sonar-scanner
+      -Dsonar.projectKey=${SCANNER_PROJECT_KEY:-sonar-report}
+      -Dsonar.projectName=${SCANNER_PROJECT_NAME:-SonarQube Report Generator}
+      -Dsonar.sources=.
+      -Dsonar.exclusions=**/*_test.go,**/vendor/**,**/node_modules/**,**/*.md,**/asset/**
+      -Dsonar.go.coverage.reportPaths=coverage.out
+    networks:
+      - sonarnet
+    profiles:
+      - scanner
+
 volumes:
   sonarqube_data:
   sonarqube_extensions:
