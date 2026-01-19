@@ -2,6 +2,14 @@
 
 A Go-based web application that automates code quality report generation from SonarQube. It produces Markdown and PDF reports featuring severity-categorized issues, accurate code snippets, and fix guidance. With parallel fetching optimization, reports generate in ~1.5 seconds—25x faster than sequential processing.
 
+## Screenshots
+
+### Login Page
+![Login Page](asset/login.png)
+
+### Dashboard
+![Dashboard](asset/dashboard.png)
+
 ## Features
 
 - **Multi-format Reports**: Generate reports in Markdown (.md) and PDF formats
