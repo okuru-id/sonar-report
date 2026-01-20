@@ -32,6 +32,7 @@ services:
     restart: unless-stopped
 
   report-generator:
+    image: kurob/sonar-report-generator:latest
     build:
       context: .
       dockerfile: Dockerfile

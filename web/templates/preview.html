@@ -8,8 +8,22 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- Tabler Icons for icons -->
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/icons@3.28.1/dist/tabler-icons.min.js"></script>
     <style>
-        /* Markdown Preview Styles - Enhanced with !important for specificity */
+        /* Tabler Icons inline SVG styles */
+        .markdown-preview .icon {
+            width: 1.25em;
+            height: 1.25em;
+            vertical-align: middle;
+            margin-right: 0.25em;
+        }
+        
+        /* Color variants for icons */
+        .markdown-preview .icon-success { color: #22c55e; }
+        .markdown-preview .icon-warning { color: #f59e0b; }
+        .markdown-preview .icon-danger { color: #ef4444; }
+        .markdown-preview .icon-info { color: #3b82f6; }
         .markdown-preview {
             color: #e2e8f0 !important;
             line-height: 1.7 !important;
@@ -222,6 +236,13 @@
         .hljs {
             background: #1e293b !important;
             padding: 1rem !important;
+        }
+        
+        /* Tabler icon styles */
+        .markdown-preview svg.icon {
+            display: inline !important;
+            vertical-align: middle;
+            margin-right: 0.25rem;
         }
         
         /* Print styles */
