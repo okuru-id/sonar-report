@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Preview - {{.projectName}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+        /* Markdown Preview Styles - Enhanced with !important for specificity */
+        .markdown-preview {
+            color: #e2e8f0 !important;
+            line-height: 1.7 !important;
+            font-size: 16px !important;
+        }
+        
+        /* Reset any conflicting styles */
+        .markdown-preview * {
+            box-sizing: border-box;
+        }
+        
+        /* Headings */
+        .markdown-preview h1 {
+            font-size: 2rem !important;
+            font-weight: bold !important;
+            margin-bottom: 1.5rem !important;
+            margin-top: 2rem !important;
+            padding-bottom: 0.5rem !important;
+            border-bottom: 2px solid #475569 !important;
+            color: #f1f5f9 !important;
+            display: block !important;
+        }
+        
+        .markdown-preview h2 {
+            font-size: 1.5rem !important;
+            font-weight: bold !important;
+            margin: 1.5rem 0 1rem !important;
+            color: #f1f5f9 !important;
+            display: block !important;
+        }
+        
+        .markdown-preview h3 {
+            font-size: 1.25rem !important;
+            font-weight: 600 !important;
+            margin: 1.25rem 0 0.75rem !important;
+            color: #cbd5e1 !important;
+            display: block !important;
+        }
+        
+        .markdown-preview h4 {
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
+            margin: 1rem 0 0.5rem !important;
+            color: #cbd5e1 !important;
+            display: block !important;
+        }
+        
+        .markdown-preview h5 {
+            font-size: 1rem !important;
+            font-weight: 600 !important;
+            margin: 0.875rem 0 0.5rem !important;
+            color: #cbd5e1 !important;
+            display: block !important;
+        }
+        
+        .markdown-preview h6 {
+            font-size: 0.875rem !important;
+            font-weight: 600 !important;
+            margin: 0.75rem 0 0.5rem !important;
+            color: #94a3b8 !important;
+            display: block !important;
+        }
+        
+        /* Paragraphs and text */
+        .markdown-preview p {
+            margin: 0.75rem 0 !important;
+            color: #e2e8f0 !important;
+            display: block !important;
+        }
+        
+        .markdown-preview strong, .markdown-preview b {
+            font-weight: bold !important;
+            color: #f1f5f9 !important;
+        }
+        
+        .markdown-preview em, .markdown-preview i {
+            font-style: italic !important;
+        }
+        
+        /* Lists */
+        .markdown-preview ul, .markdown-preview ol {
+            margin: 0.75rem 0 !important;
+            padding-left: 2rem !important;
+            color: #e2e8f0 !important;
+        }
+        
+        .markdown-preview li {
+            margin: 0.25rem 0 !important;
+            color: #e2e8f0 !important;
+        }
+        
+        /* Tables */
+        .markdown-preview table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            margin: 1rem 0 !important;
+            font-size: 0.875rem !important;
+            background: #1e293b !important;
+            border-radius: 0.5rem !important;
+            overflow: hidden !important;
+            display: table !important;
+        }
+        
+        .markdown-preview th, .markdown-preview td {
+            border: 1px solid #475569 !important;
+            padding: 0.75rem !important;
+            text-align: left !important;
+            color: #e2e8f0 !important;
+        }
+        
+        .markdown-preview th {
+            background: #334155 !important;
+            font-weight: 600 !important;
+            color: #f1f5f9 !important;
+        }
+        
+        .markdown-preview tr:hover {
+            background: #334155 !important;
+        }
+        
+        /* Horizontal Rule */
+        .markdown-preview hr {
+            border: none !important;
+            border-top: 1px solid #475569 !important;
+            margin: 1.5rem 0 !important;
+            display: block !important;
+        }
+        
+        /* Blockquotes */
+        .markdown-preview blockquote {
+            border-left: 4px solid #3b82f6 !important;
+            padding-left: 1rem !important;
+            margin: 1rem 0 !important;
+            color: #94a3b8 !important;
+            font-style: italic !important;
+        }
+        
+        /* Code blocks */
+        .markdown-preview code {
+            background: #1e293b !important;
+            padding: 0.2rem 0.4rem !important;
+            border-radius: 0.25rem !important;
+            font-family: 'Courier New', monospace !important;
+            font-size: 0.875rem !important;
+            color: #f472b6 !important;
+        }
+        
+        .markdown-preview pre {
+            background: #1e293b !important;
+            border: 1px solid #475569 !important;
+            border-radius: 0.5rem !important;
+            padding: 1rem !important;
+            overflow-x: auto !important;
+            margin: 1rem 0 !important;
+            display: block !important;
+        }
+        
+        .markdown-preview pre code {
+            background: transparent !important;
+            padding: 0 !important;
+            color: inherit !important;
+            font-size: 0.875rem !important;
+            line-height: 1.5 !important;
+        }
+        
+        /* Links */
+        .markdown-preview a {
+            color: #60a5fa !important;
+            text-decoration: underline !important;
+        }
+        
+        .markdown-preview a:hover {
+            color: #93c5fd !important;
+        }
+        
+        /* Images */
+        .markdown-preview img {
+            max-width: 100% !important;
+            height: auto !important;
+            border-radius: 0.5rem !important;
+            margin: 1rem 0 !important;
+        }
+        
+        /* Div elements (for raw HTML in markdown) */
+        .markdown-preview div {
+            color: #e2e8f0 !important;
+        }
+        
+        /* Special: Make sure text is visible */
+        .markdown-preview {
+            visibility: visible !important;
+            opacity: 1 !important;
+            display: block !important;
+        }
+        
+        .markdown-preview > * {
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        /* Sticky Header */
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(12px);
+        }
+        
+        /* Code highlight override */
+        .hljs {
+            background: #1e293b !important;
+            padding: 1rem !important;
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                background: white !important;
+            }
+            .sticky-header, .no-print {
+                display: none !important;
+            }
+            .markdown-preview {
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <!-- Sticky Header -->
+    <div class="sticky-header bg-slate-800/80 border-b border-slate-700/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Project Info -->
+                <div class="flex-1">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-semibold text-white">{{.projectName}}</h1>
+                            <div class="flex items-center space-x-3 text-sm text-slate-400">
+                                <span class="flex items-center">
+                                    <code class="bg-slate-900 px-2 py-0.5 rounded text-xs">{{.projectKey}}</code>
+                                </span>
+                                {{if .branch}}
+                                <span>•</span>
+                                <span>Branch: <code class="bg-slate-900 px-2 py-0.5 rounded text-xs">{{.branch}}</code></span>
+                                {{end}}
+                                <span>•</span>
+                                <span>{{.generatedAt}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex items-center space-x-3">
+                    <a 
+                        href="/dashboard"
+                        class="px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-all flex items-center space-x-2"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+                    <a 
+                        href="/api/v1/reports/{{.reportID}}/download"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all flex items-center space-x-2"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        <span>Download</span>
+                    </a>
+                    <button 
+                        onclick="window.close()"
+                        class="px-4 py-2 text-sm text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-all"
+                        title="Close Tab"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-8">
+            <div id="markdown-content" class="markdown-preview"></div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-slate-500 text-sm">
+        <p>Generated by SonarQube Report Generator</p>
+    </footer>
+
+    <script>
+        // Debug: Log to console
+        console.log('Preview page loaded');
+        
+        // Markdown content from backend (already properly escaped JSON)
+        let markdownContent;
+        try {
+            // The backend sends: template.JS(json.Marshal(string))
+            // which results in a JSON string like: "content here\nwith newlines"
+            markdownContent = {{.markdownContent}};
+            console.log('Markdown content loaded successfully');
+            console.log('Content type:', typeof markdownContent);
+            console.log('Content length:', markdownContent ? markdownContent.length : 0);
+            console.log('First 100 chars:', markdownContent ? markdownContent.substring(0, 100) : 'empty');
+        } catch (err) {
+            console.error('Failed to load markdown content:', err);
+            document.getElementById('markdown-content').innerHTML = 
+                '<div class="text-red-400"><p class="font-bold">Error loading content</p><p>' + err.message + '</p></div>';
+        }
+        
+        // Configure marked with highlight.js
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({
+                highlight: function(code, lang) {
+                    if (lang && hljs.getLanguage(lang)) {
+                        try {
+                            return hljs.highlight(code, { language: lang }).value;
+                        } catch (err) {
+                            console.error('Highlight error:', err);
+                        }
+                    }
+                    return hljs.highlightAuto(code).value;
+                },
+                breaks: true,
+                gfm: true,
+                // Allow raw HTML in markdown
+                sanitize: false,
+                // Pedantic mode off for better compatibility
+                pedantic: false,
+                // Use smart lists
+                smartLists: true,
+                // Use smartypants for typography
+                smartypants: false
+            });
+            console.log('marked.js configured successfully');
+        } else {
+            console.error('marked.js not loaded');
+        }
+        
+        // Parse and render markdown
+        document.addEventListener('DOMContentLoaded', function() {
+            const contentDiv = document.getElementById('markdown-content');
+            
+            console.log('DOM loaded, starting render...');
+            
+            if (!markdownContent || markdownContent.trim() === '') {
+                console.warn('No markdown content available');
+                contentDiv.innerHTML = '<p class="text-yellow-400">No content available.</p>';
+                return;
+            }
+            
+            try {
+                // Parse markdown to HTML
+                const html = marked.parse(markdownContent);
+                console.log('Markdown parsed to HTML successfully');
+                console.log('HTML length:', html.length);
+                console.log('First 200 chars of HTML:', html.substring(0, 200));
+                
+                // Clear any existing content first
+                contentDiv.innerHTML = '';
+                
+                // Inject HTML into DOM
+                contentDiv.innerHTML = html;
+                
+                // Verify injection
+                console.log('After injection - contentDiv.innerHTML length:', contentDiv.innerHTML.length);
+                console.log('After injection - contentDiv.children.length:', contentDiv.children.length);
+                
+                // Force visibility (in case CSS is overridden)
+                contentDiv.style.visibility = 'visible';
+                contentDiv.style.opacity = '1';
+                contentDiv.style.display = 'block';
+                
+                // Apply syntax highlighting to code blocks
+                const codeBlocks = contentDiv.querySelectorAll('pre code');
+                console.log('Found', codeBlocks.length, 'code blocks');
+                
+                codeBlocks.forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+                
+                // Post-processing: Ensure all elements are visible
+                const allElements = contentDiv.querySelectorAll('*');
+                let processedCount = 0;
+                allElements.forEach((el) => {
+                    // Force visibility for all elements
+                    if (window.getComputedStyle(el).display === 'none') {
+                        el.style.display = 'block';
+                        processedCount++;
+                    }
+                    if (window.getComputedStyle(el).visibility === 'hidden') {
+                        el.style.visibility = 'visible';
+                        processedCount++;
+                    }
+                    if (window.getComputedStyle(el).opacity === '0') {
+                        el.style.opacity = '1';
+                        processedCount++;
+                    }
+                });
+                
+                if (processedCount > 0) {
+                    console.log('Fixed', processedCount, 'hidden elements');
+                }
+                
+                console.log('✅ Rendering complete!');
+                
+                // Log element counts for debugging
+                console.log('Element counts:', {
+                    h1: contentDiv.querySelectorAll('h1').length,
+                    h2: contentDiv.querySelectorAll('h2').length,
+                    h3: contentDiv.querySelectorAll('h3').length,
+                    h4: contentDiv.querySelectorAll('h4').length,
+                    p: contentDiv.querySelectorAll('p').length,
+                    tables: contentDiv.querySelectorAll('table').length,
+                    lists: contentDiv.querySelectorAll('ul, ol').length
+                });
+                
+            } catch (err) {
+                console.error('Failed to parse markdown:', err);
+                contentDiv.innerHTML = '<div class="text-red-400"><p class="font-bold text-lg mb-2">Failed to render markdown content</p><p class="text-sm">' + err.message + '</p><pre class="mt-4 text-xs bg-slate-900 p-4 rounded overflow-auto">' + err.stack + '</pre></div>';
+            }
+        });
+    </script>
+</body>
+</html>

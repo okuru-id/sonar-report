@@ -51,7 +51,7 @@ func main() {
 
 	// Initialize handlers
 	apiHandler := handler.NewAPIHandler(sonarClient, storage)
-	webHandler := handler.NewWebHandler(authenticator, sonarClient)
+	webHandler := handler.NewWebHandler(authenticator, sonarClient, storage)
 
 	// Setup Gin
 	gin.SetMode(gin.ReleaseMode)
@@ -77,6 +77,7 @@ func main() {
 	protected.Use(authenticator.AuthMiddleware())
 	{
 		protected.GET("/dashboard", webHandler.Dashboard)
+		protected.GET("/reports/:id/preview", webHandler.PreviewReportPage)
 	}
 
 	// Protected API routes

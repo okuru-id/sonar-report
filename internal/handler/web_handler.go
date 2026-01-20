@@ -1,12 +1,15 @@
 package handler
 
 import (
+	"encoding/json"
 	"html/template"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 
 	"sonarqube-report-generator/internal/auth"
+	"sonarqube-report-generator/internal/report"
 	"sonarqube-report-generator/internal/sonarqube"
 )
 
@@ -14,14 +17,16 @@ import (
 type WebHandler struct {
 	authenticator *auth.Authenticator
 	sonarClient   *sonarqube.Client
+	storage       *report.Storage
 	templates     *template.Template
 }
 
 // NewWebHandler creates a new web handler
-func NewWebHandler(authenticator *auth.Authenticator, client *sonarqube.Client) *WebHandler {
+func NewWebHandler(authenticator *auth.Authenticator, client *sonarqube.Client, storage *report.Storage) *WebHandler {
 	return &WebHandler{
 		authenticator: authenticator,
 		sonarClient:   client,
+		storage:       storage,
 	}
 }
 
@@ -92,4 +97,67 @@ func (h *WebHandler) Index(c *gin.Context) {
 		return
 	}
 	c.Redirect(http.StatusFound, "/login")
+}
+
+// PreviewReportPage renders the report preview page in a new tab
+func (h *WebHandler) PreviewReportPage(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.HTML(http.StatusBadRequest, "preview.html", gin.H{
+			"error": "Report ID is required",
+		})
+		return
+	}
+
+	// Get report record
+	record, err := h.storage.GetRecord(id)
+	if err != nil {
+		c.HTML(http.StatusNotFound, "preview.html", gin.H{
+			"error": "Report not found: " + err.Error(),
+		})
+		return
+	}
+
+	// Only support markdown preview
+	if record.Format != "md" {
+		c.HTML(http.StatusBadRequest, "preview.html", gin.H{
+			"error": "Preview is only available for Markdown reports. Please download the PDF instead.",
+		})
+		return
+	}
+
+	// Read markdown content
+	content, err := os.ReadFile(record.FilePath)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "preview.html", gin.H{
+			"error": "Failed to read report file: " + err.Error(),
+		})
+		return
+	}
+
+	// Convert to string and escape for JavaScript
+	markdownStr := string(content)
+
+	// Marshal to JSON to properly escape special characters
+	markdownJSON, err := json.Marshal(markdownStr)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "preview.html", gin.H{
+			"error": "Failed to process markdown content: " + err.Error(),
+		})
+		return
+	}
+
+	// Format generated date
+	generatedAt := record.GeneratedAt.Format("Jan 2, 2006 at 3:04 PM")
+
+	// Render preview template
+	// markdownJSON is already a JSON string (with quotes), so we use it directly
+	c.HTML(http.StatusOK, "preview.html", gin.H{
+		"reportID":        record.ID,
+		"projectKey":      record.ProjectKey,
+		"projectName":     record.ProjectName,
+		"branch":          record.Branch,
+		"generatedAt":     generatedAt,
+		"markdownContent": template.JS(markdownJSON),
+	})
 }
