@@ -161,3 +161,65 @@ func (h *WebHandler) PreviewReportPage(c *gin.Context) {
 		"markdownContent": template.JS(markdownJSON),
 	})
 }
+
+// ShareReportPage renders the report share page (public, no login required)
+func (h *WebHandler) ShareReportPage(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		c.HTML(http.StatusBadRequest, "share.html", gin.H{
+			"error": "Report ID is required",
+		})
+		return
+	}
+
+	// Get report record
+	record, err := h.storage.GetRecord(id)
+	if err != nil {
+		c.HTML(http.StatusNotFound, "share.html", gin.H{
+			"error": "Report not found: " + err.Error(),
+		})
+		return
+	}
+
+	// Only support markdown preview
+	if record.Format != "md" {
+		c.HTML(http.StatusBadRequest, "share.html", gin.H{
+			"error": "Share is only available for Markdown reports. Please download the PDF instead.",
+		})
+		return
+	}
+
+	// Read markdown content
+	content, err := os.ReadFile(record.FilePath)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "share.html", gin.H{
+			"error": "Failed to read report file: " + err.Error(),
+		})
+		return
+	}
+
+	// Convert to string and escape for JavaScript
+	markdownStr := string(content)
+
+	// Marshal to JSON to properly escape special characters
+	markdownJSON, err := json.Marshal(markdownStr)
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "share.html", gin.H{
+			"error": "Failed to process markdown content: " + err.Error(),
+		})
+		return
+	}
+
+	// Format generated date
+	generatedAt := record.GeneratedAt.Format("Jan 2, 2006 at 3:04 PM")
+
+	// Render share template
+	c.HTML(http.StatusOK, "share.html", gin.H{
+		"reportID":        record.ID,
+		"projectKey":      record.ProjectKey,
+		"projectName":     record.ProjectName,
+		"branch":          record.Branch,
+		"generatedAt":     generatedAt,
+		"markdownContent": template.JS(markdownJSON),
+	})
+}

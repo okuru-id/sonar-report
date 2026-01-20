@@ -10,10 +10,10 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+<body class="min-h-screen bg-gray-50">
     <div x-data="dashboard()" x-init="init()" class="min-h-screen">
         <!-- Navbar -->
-        <nav class="bg-slate-800/50 backdrop-blur-xl border-b border-slate-700/50 sticky top-0 z-40">
+        <nav class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center space-x-3">
@@ -22,11 +22,11 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
                         </div>
-                        <span class="text-white font-semibold text-lg">SonarQube Report Generator</span>
+                        <span class="text-gray-900 font-semibold text-lg">SonarQube Report Generator</span>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <span class="text-slate-400 text-sm">Welcome, <span class="text-white">{{.user}}</span></span>
-                        <a href="/logout" class="px-4 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-all">
+                        <span class="text-gray-500 text-sm">Welcome, <span class="text-gray-900">{{.user}}</span></span>
+                        <a href="/logout" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all">
                             Logout
                         </a>
                     </div>
@@ -37,9 +37,9 @@
         <!-- Main Content -->
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <!-- Generate Report Card -->
-            <div class="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 mb-6">
-                <h2 class="text-xl font-semibold text-white mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                     Generate Report
@@ -48,11 +48,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <!-- Project Select -->
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Project</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Project</label>
                         <select 
                             x-model="selectedProject"
                             @change="loadBranches()"
-                            class="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">Select a project...</option>
                             <template x-for="project in projects" :key="project.key">
@@ -63,11 +63,11 @@
 
                     <!-- Branch Select -->
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Branch</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Branch</label>
                         <select 
                             x-model="selectedBranch"
                             :disabled="!selectedProject"
-                            class="w-full px-4 py-2.5 bg-slate-900/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                            class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
                         >
                             <option value="">Default branch</option>
                             <template x-for="branch in branches" :key="branch.name">
@@ -78,17 +78,17 @@
 
                     <!-- Format Select -->
                     <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Format</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Format</label>
                         <div class="flex space-x-4">
                             <label class="flex items-center cursor-pointer">
                                 <input type="radio" x-model="selectedFormat" value="md" class="sr-only peer">
-                                <div class="px-4 py-2.5 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 peer-checked:text-white transition-all">
+                                <div class="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-600 peer-checked:bg-blue-600 peer-checked:border-blue-600 peer-checked:text-white transition-all">
                                     Markdown
                                 </div>
                             </label>
                             <label class="flex items-center cursor-pointer">
                                 <input type="radio" x-model="selectedFormat" value="pdf" class="sr-only peer">
-                                <div class="px-4 py-2.5 bg-slate-900/50 border border-slate-600 rounded-lg text-slate-400 peer-checked:bg-blue-600 peer-checked:border-blue-600 peer-checked:text-white transition-all">
+                                <div class="px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-600 peer-checked:bg-blue-600 peer-checked:border-blue-600 peer-checked:text-white transition-all">
                                     PDF
                                 </div>
                             </label>
@@ -100,7 +100,7 @@
                         <button 
                             @click="generateReport()"
                             :disabled="!selectedProject || loading"
-                            class="w-full px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all flex items-center justify-center space-x-2"
+                            class="w-full px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all flex items-center justify-center space-x-2"
                         >
                             <template x-if="loading">
                                 <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
@@ -119,10 +119,10 @@
                 </div>
 
                 <!-- Advanced Options -->
-                <div class="mt-4 pt-4 border-t border-slate-700/50">
+                <div class="mt-4 pt-4 border-t border-gray-200">
                     <button 
                         @click="showAdvancedOptions = !showAdvancedOptions"
-                        class="text-sm text-slate-400 hover:text-white flex items-center"
+                        class="text-sm text-gray-500 hover:text-gray-900 flex items-center"
                     >
                         <svg class="w-4 h-4 mr-1 transition-transform" :class="showAdvancedOptions ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -131,38 +131,38 @@
                     </button>
                     <div x-show="showAdvancedOptions" x-cloak class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
                         <label class="flex items-center space-x-3 cursor-pointer">
-                            <input type="checkbox" x-model="includeCodeSnippets" class="w-4 h-4 rounded bg-slate-900 border-slate-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-slate-800">
+                            <input type="checkbox" x-model="includeCodeSnippets" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                             <div>
-                                <span class="text-sm text-slate-300">Include Code Snippets</span>
-                                <p class="text-xs text-slate-500">Show problematic code in issues</p>
+                                <span class="text-sm text-gray-700">Include Code Snippets</span>
+                                <p class="text-xs text-gray-500">Show problematic code in issues</p>
                             </div>
                         </label>
                         <label class="flex items-center space-x-3 cursor-pointer">
-                            <input type="checkbox" x-model="includeHowToFix" class="w-4 h-4 rounded bg-slate-900 border-slate-600 text-blue-600 focus:ring-blue-500 focus:ring-offset-slate-800">
+                            <input type="checkbox" x-model="includeHowToFix" class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                             <div>
-                                <span class="text-sm text-slate-300">Include How to Fix</span>
-                                <p class="text-xs text-slate-500">Show fix recommendations from rules</p>
+                                <span class="text-sm text-gray-700">Include How to Fix</span>
+                                <p class="text-xs text-gray-500">Show fix recommendations from rules</p>
                             </div>
                         </label>
                     </div>
                 </div>
 
                 <!-- Error Message -->
-                <div x-show="error" x-cloak class="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-                    <p class="text-red-400 text-sm" x-text="error"></p>
+                <div x-show="error" x-cloak class="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p class="text-red-600 text-sm" x-text="error"></p>
                 </div>
             </div>
 
             <!-- Projects List -->
-            <div class="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6 mb-6">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-white flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
                         </svg>
                         Projects
                     </h2>
-                    <button @click="loadProjects()" class="text-sm text-blue-400 hover:text-blue-300 flex items-center">
+                    <button @click="loadProjects()" class="text-sm text-blue-600 hover:text-blue-700 flex items-center">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                         </svg>
@@ -173,25 +173,25 @@
                 <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead>
-                            <tr class="text-left text-slate-400 text-sm">
+                            <tr class="text-left text-gray-500 text-sm">
                                 <th class="pb-3 font-medium">Name</th>
                                 <th class="pb-3 font-medium">Key</th>
                                 <th class="pb-3 font-medium">Last Analysis</th>
                                 <th class="pb-3 font-medium text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="text-slate-300">
+                        <tbody class="text-gray-700">
                             <template x-for="project in projects" :key="project.key">
-                                <tr class="border-t border-slate-700/50 hover:bg-slate-700/20">
+                                <tr class="border-t border-gray-100 hover:bg-gray-50">
                                     <td class="py-3" x-text="project.name"></td>
                                     <td class="py-3">
-                                        <code class="text-xs bg-slate-900 px-2 py-1 rounded" x-text="project.key"></code>
+                                        <code class="text-xs bg-gray-100 px-2 py-1 rounded" x-text="project.key"></code>
                                     </td>
-                                    <td class="py-3 text-sm text-slate-400" x-text="formatDate(project.lastAnalysisDate)"></td>
+                                    <td class="py-3 text-sm text-gray-500" x-text="formatDate(project.lastAnalysisDate)"></td>
                                     <td class="py-3 text-right">
                                         <button 
                                             @click="quickGenerate(project.key)"
-                                            class="text-sm text-blue-400 hover:text-blue-300"
+                                            class="text-sm text-blue-600 hover:text-blue-700"
                                         >
                                             Quick Generate
                                         </button>
@@ -199,7 +199,7 @@
                                 </tr>
                             </template>
                             <tr x-show="projects.length === 0">
-                                <td colspan="4" class="py-8 text-center text-slate-500">
+                                <td colspan="4" class="py-8 text-center text-gray-500">
                                     No projects found
                                 </td>
                             </tr>
@@ -209,10 +209,10 @@
             </div>
 
             <!-- Report History -->
-            <div class="bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 p-6">
+            <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xl font-semibold text-white flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         Report History
@@ -220,7 +220,7 @@
                     <button 
                         @click="clearHistory()" 
                         x-show="history.length > 0"
-                        class="text-sm text-red-400 hover:text-red-300 flex items-center"
+                        class="text-sm text-red-600 hover:text-red-700 flex items-center"
                     >
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -232,48 +232,61 @@
                 <div class="overflow-x-auto">
                     <table class="w-full">
                         <thead>
-                            <tr class="text-left text-slate-400 text-sm">
+                            <tr class="text-left text-gray-500 text-sm">
+                                <th class="pb-3 font-medium w-16">Actions</th>
                                 <th class="pb-3 font-medium">Project</th>
                                 <th class="pb-3 font-medium">Branch</th>
                                 <th class="pb-3 font-medium">Format</th>
                                 <th class="pb-3 font-medium">Generated</th>
                                 <th class="pb-3 font-medium">Size</th>
-                                <th class="pb-3 font-medium text-right">Actions</th>
+                                <th class="pb-3 font-medium text-right">Links</th>
                             </tr>
                         </thead>
-                        <tbody class="text-slate-300">
+                        <tbody class="text-gray-700">
                             <template x-for="report in history" :key="report.id">
-                                <tr class="border-t border-slate-700/50 hover:bg-slate-700/20">
+                                <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                    <td class="py-3 w-16">
+                                        <button 
+                                            @click="shareReport(report)" 
+                                            class="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100 transition-colors"
+                                            title="Share"
+                                        >
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                     d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                            </svg>
+                                        </button>
+                                    </td>
                                     <td class="py-3" x-text="report.projectName || report.projectKey"></td>
                                     <td class="py-3">
-                                        <code class="text-xs bg-slate-900 px-2 py-1 rounded" x-text="report.branch || 'default'"></code>
+                                        <code class="text-xs bg-gray-100 px-2 py-1 rounded" x-text="report.branch || 'default'"></code>
                                     </td>
                                     <td class="py-3">
                                         <span 
                                             class="text-xs px-2 py-1 rounded"
-                                            :class="report.format === 'pdf' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'"
+                                            :class="report.format === 'pdf' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'"
                                             x-text="report.format.toUpperCase()"
                                         ></span>
                                     </td>
-                                    <td class="py-3 text-sm text-slate-400" x-text="formatDate(report.generatedAt)"></td>
-                                    <td class="py-3 text-sm text-slate-400" x-text="formatSize(report.fileSize)"></td>
+                                    <td class="py-3 text-sm text-gray-500" x-text="formatDate(report.generatedAt)"></td>
+                                    <td class="py-3 text-sm text-gray-500" x-text="formatSize(report.fileSize)"></td>
                                     <td class="py-3 text-right space-x-2">
                                         <button 
                                             @click="previewReport(report)"
                                             x-show="report.format === 'md'"
-                                            class="text-sm text-green-400 hover:text-green-300"
+                                            class="text-sm text-green-600 hover:text-green-700"
                                         >
                                             Preview
                                         </button>
                                         <a 
                                             :href="'/api/v1/reports/' + report.id + '/download'"
-                                            class="text-sm text-blue-400 hover:text-blue-300"
+                                            class="text-sm text-blue-600 hover:text-blue-700"
                                         >
                                             Download
                                         </a>
                                         <button 
                                             @click="deleteReport(report.id)"
-                                            class="text-sm text-red-400 hover:text-red-300"
+                                            class="text-sm text-red-600 hover:text-red-700"
                                         >
                                             Delete
                                         </button>
@@ -281,7 +294,7 @@
                                 </tr>
                             </template>
                             <tr x-show="history.length === 0">
-                                <td colspan="6" class="py-8 text-center text-slate-500">
+                                <td colspan="7" class="py-8 text-center text-gray-500">
                                     No reports generated yet
                                 </td>
                             </tr>
@@ -385,15 +398,20 @@
                         // Refresh history
                         await this.loadHistory();
                         
-                        // Auto download
+                        // Show success message
                         if (data.report) {
-                            window.location.href = `/api/v1/reports/${data.report.id}/download`;
+                            this.lastGeneratedReport = data.report;
                         }
                     } catch (err) {
                         this.error = err.message;
                     } finally {
                         this.loading = false;
                     }
+                },
+                
+                // Share report - open share page in new tab
+                shareReport(report) {
+                    window.open(`/share/${report.id}`, '_blank');
                 },
                 
                 // Quick generate with default settings

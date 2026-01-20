@@ -83,6 +83,7 @@ func main() {
 	r.GET("/login", webHandler.LoginPage)
 	r.POST("/login", webHandler.Login)
 	r.GET("/logout", webHandler.Logout)
+	r.GET("/share/:id", webHandler.ShareReportPage)
 
 	// Health check (public)
 	r.GET("/api/v1/health", apiHandler.HealthCheck)
