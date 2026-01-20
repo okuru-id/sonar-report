@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
 	"path/filepath"
 
@@ -231,4 +234,127 @@ func (h *APIHandler) ClearHistory(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true})
+}
+
+// JenkinsTriggerRequest represents the request structure for Jenkins trigger
+type JenkinsTriggerRequest struct {
+	JenkinsURL   string `header:"X-Jenkins-Url"`
+	JenkinsToken string `header:"X-Jenkins-Token"`
+	JenkinsJob   string `header:"X-Jenkins-Job"`
+	JenkinsUser  string `header:"X-Jenkins-User"`
+}
+
+// JenkinsCrumbResponse represents the crumb response from Jenkins
+type JenkinsCrumbResponse struct {
+	CrumbRequestField string `json:"crumbRequestField"`
+	Crumb             string `json:"crumb"`
+}
+
+// TriggerJenkins triggers a Jenkins job build
+func (h *APIHandler) TriggerJenkins(c *gin.Context) {
+	// Parse headers
+	var req JenkinsTriggerRequest
+	if err := c.ShouldBindHeader(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing or invalid headers"})
+		return
+	}
+
+	// Validate required headers
+	if req.JenkinsURL == "" || req.JenkinsToken == "" || req.JenkinsJob == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "X-Jenkins-Url, X-Jenkins-Token, and X-Jenkins-Job headers are required"})
+		return
+	}
+
+	// Set default user if not provided
+	user := "sonar"
+	if req.JenkinsUser != "" {
+		user = req.JenkinsUser
+	}
+
+	// Get crumb from Jenkins for CSRF protection
+	crumbURL := fmt.Sprintf("%s/crumbIssuer/api/json", req.JenkinsURL)
+	crumbReq, err := http.NewRequest("GET", crumbURL, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to create crumb request: %v", err)})
+		return
+	}
+
+	// Set basic auth for crumb request
+	crumbReq.SetBasicAuth(user, req.JenkinsToken)
+
+	crumbResp, err := http.DefaultClient.Do(crumbReq)
+	if err != nil {
+		errorMsg := fmt.Sprintf("Failed to connect to Jenkins: %v", err)
+		if err.Error() == "dial tcp: lookup" || err.Error() == "connect: connection refused" || err.Error() == "no such host" {
+			errorMsg = fmt.Sprintf("Cannot connect to Jenkins server at %s. Please check: 1) Jenkins is running, 2) Network connectivity, 3) Correct URL and port", req.JenkinsURL)
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"error": errorMsg})
+		return
+	}
+	defer crumbResp.Body.Close()
+
+	if crumbResp.StatusCode == http.StatusForbidden {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Jenkins authentication failed: User does not have permission to access crumb issuer. Please check: 1) User has 'Overall/Read' permission, 2) CSRF protection is enabled, 3) User can access /crumbIssuer/api/json endpoint."})
+		return
+	}
+
+	if crumbResp.StatusCode != http.StatusOK {
+		// Try to read response body for more details
+		errorBody, _ := io.ReadAll(crumbResp.Body)
+		errorMsg := fmt.Sprintf("Failed to get Jenkins crumb: HTTP %d", crumbResp.StatusCode)
+		if len(errorBody) > 0 {
+			errorMsg += fmt.Sprintf(" - %s", string(errorBody))
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": errorMsg})
+		return
+	}
+
+	// Parse crumb response
+	var crumbData JenkinsCrumbResponse
+	body, _ := io.ReadAll(crumbResp.Body)
+	if err := json.Unmarshal(body, &crumbData); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to parse Jenkins crumb response: %v", err)})
+		return
+	}
+
+	// Build the Jenkins job URL
+	jobURL := fmt.Sprintf("%s/job/%s/build", req.JenkinsURL, req.JenkinsJob)
+
+	// Create request to trigger Jenkins job
+	client := &http.Client{}
+	buildReq, err := http.NewRequest("POST", jobURL, nil)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to create Jenkins build request: %v", err)})
+		return
+	}
+
+	// Set headers for Jenkins authentication and CSRF protection
+	buildReq.SetBasicAuth(user, req.JenkinsToken)
+	buildReq.Header.Set(crumbData.CrumbRequestField, crumbData.Crumb)
+
+	// Execute the request
+	buildResp, err := client.Do(buildReq)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to trigger Jenkins job: %v", err)})
+		return
+	}
+	defer buildResp.Body.Close()
+
+	if buildResp.StatusCode == http.StatusForbidden {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Jenkins job trigger failed: Invalid credentials or insufficient permissions. Please check your Jenkins token and user permissions."})
+		return
+	}
+
+	if buildResp.StatusCode != http.StatusCreated && buildResp.StatusCode != http.StatusOK {
+		// Read response body for error details
+		errorBody, _ := io.ReadAll(buildResp.Body)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Jenkins job trigger failed: HTTP %d - %s", buildResp.StatusCode, string(errorBody))})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Jenkins job triggered successfully",
+		"job":     req.JenkinsJob,
+	})
 }

@@ -88,6 +88,9 @@ func main() {
 	// Health check (public)
 	r.GET("/api/v1/health", apiHandler.HealthCheck)
 
+	// Public API routes (no authentication)
+	r.POST("/api/v1/jenkins/trigger", apiHandler.TriggerJenkins)
+
 	// Protected web routes
 	protected := r.Group("/")
 	protected.Use(authenticator.AuthMiddleware())
