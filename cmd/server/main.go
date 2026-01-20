@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -55,7 +56,21 @@ func main() {
 
 	// Setup Gin
 	gin.SetMode(gin.ReleaseMode)
-	r := gin.Default()
+	r := gin.New()
+	r.Use(gin.RecoveryWithWriter(gin.DefaultWriter))
+	r.Use(gin.Logger())
+
+	// Custom recovery that returns JSON
+	r.Use(func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				c.AbortWithStatusJSON(500, gin.H{
+					"error": fmt.Sprintf("Internal server error: %v", err),
+				})
+			}
+		}()
+		c.Next()
+	})
 
 	// Load templates
 	r.LoadHTMLGlob("web/templates/*.html")

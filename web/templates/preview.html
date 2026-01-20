@@ -249,12 +249,57 @@
         @media print {
             body {
                 background: white !important;
+                min-height: auto !important;
             }
             .sticky-header, .no-print {
                 display: none !important;
             }
             .markdown-preview {
                 color: black !important;
+                background: white !important;
+            }
+            .markdown-preview h1, .markdown-preview h2, .markdown-preview h3,
+            .markdown-preview h4, .markdown-preview h5, .markdown-preview h6 {
+                color: #1e293b !important;
+            }
+            .markdown-preview strong, .markdown-preview b {
+                color: #1e293b !important;
+            }
+            .markdown-preview table {
+                background: white !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+            .markdown-preview th {
+                background: #f1f5f9 !important;
+                color: #1e293b !important;
+            }
+            .markdown-preview td, .markdown-preview th {
+                border-color: #e2e8f0 !important;
+            }
+            .markdown-preview pre {
+                background: #f8fafc !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+            .markdown-preview code {
+                background: #f1f5f9 !important;
+                color: #1e293b !important;
+            }
+            .markdown-preview blockquote {
+                border-left-color: #3b82f6 !important;
+                background: #f8fafc !important;
+            }
+            .markdown-preview svg.icon {
+                display: inline-block !important;
+                width: 20px !important;
+                height: 20px !important;
+            }
+            .bg-slate-800\/50 {
+                background: white !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+            @page {
+                margin: 1cm;
+                size: A4;
             }
         }
     </style>

@@ -61,6 +61,11 @@ func (c *Client) doRequest(method, endpoint string, params url.Values) ([]byte, 
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
+	// Check if response body is empty
+	if len(body) == 0 {
+		return nil, fmt.Errorf("empty response from SonarQube API (status: %d)", resp.StatusCode)
+	}
+
 	if resp.StatusCode >= 400 {
 		return nil, fmt.Errorf("API error (status %d): %s", resp.StatusCode, string(body))
 	}
